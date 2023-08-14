@@ -1,0 +1,10 @@
+{
+  "expenses": [
+    {
+      "description": "hooo",
+      "amount": 6,
+      "category": "Groceries",
+      "id": 25778
+    }
+  ]
+}
