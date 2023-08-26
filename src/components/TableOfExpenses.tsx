@@ -17,7 +17,6 @@ interface Props {
 const TableOfExpenses = ({
   expenses,
   editedExpense,
-
   setEditedExpense,
   onEdit,
   onSave,

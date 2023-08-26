@@ -25,8 +25,10 @@ const SearchByDescription = ({
   return (
     <Select
       label="Search expense by description"
-      data={["", ...expensesDescriptions]}
+      placeholder=""
+      data={expensesDescriptions}
       searchable
+      clearable
       searchValue={searchValue}
       onSearchChange={setSearchValue}
       nothingFound="No such expense"

@@ -70,11 +70,11 @@ const ExpenseForm = ({ addExpense }: Props) => {
           rules={{ required: true }}
           render={({ field }) => (
             <NumberInput
-              withAsterisk
-              styles={labelAndAsterisk}
-              label="Amount"
               {...field}
               onChange={(value) => field.onChange(value)}
+              label="Amount"
+              withAsterisk
+              styles={labelAndAsterisk}
               precision={2}
               min={0}
               error={errors.amount?.message}
@@ -89,10 +89,10 @@ const ExpenseForm = ({ addExpense }: Props) => {
           rules={{ required: true }}
           render={({ field }) => (
             <Select
+              {...field}
+              data={categories}
               label="Category"
               styles={{ label: { color: "steelblue" } }}
-              {...field}
-              data={[...categories]}
               mb="xl"
             />
           )}

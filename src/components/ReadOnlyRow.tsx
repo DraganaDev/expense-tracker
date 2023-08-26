@@ -1,5 +1,7 @@
 import { Button, Center } from "@mantine/core";
 import { type Expense } from "../layouts/ExpensesLayout";
+import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { useMediaQuery } from "@mantine/hooks";
 
 interface Props {
   expense: Expense;
@@ -7,6 +9,8 @@ interface Props {
   onDelete: (id: number) => void;
 }
 const ReadOnlyRow = ({ expense, onEdit, onDelete }: Props) => {
+  const widthLessThan576 = useMediaQuery("(max-width: 576px)");
+  const paddingX = widthLessThan576 ? "xs" : "lg";
   return (
     <>
       <td>{expense.description}</td>
@@ -18,17 +22,19 @@ const ReadOnlyRow = ({ expense, onEdit, onDelete }: Props) => {
             variant="light"
             color="grape"
             mr="sm"
+            px={paddingX}
             onClick={() => onEdit(expense)}
           >
-            Edit
+            {widthLessThan576 ? <IconPencil stroke={1.2} /> : " Edit"}
           </Button>
           <Button
             variant="light"
             color="gray"
             c="red.9"
+            px={paddingX}
             onClick={() => onDelete(expense.id)}
           >
-            Delete
+            {widthLessThan576 ? <IconTrash stroke={1.2} /> : " Delete"}
           </Button>
         </Center>
       </td>

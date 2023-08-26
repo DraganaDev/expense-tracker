@@ -1,6 +1,8 @@
 import { TextInput, NumberInput, Select, Button, Center } from "@mantine/core";
 import { categories } from "../categories";
 import { Expense } from "../layouts/ExpensesLayout";
+import { useMediaQuery } from "@mantine/hooks";
+import { IconCheck, IconX } from "@tabler/icons-react";
 
 interface Props {
   editedExpense: Expense;
@@ -15,17 +17,22 @@ const EditableRow = ({
   onSave,
   onCancel,
 }: Props) => {
+  const widthLessThan576 = useMediaQuery("(max-width: 576px)");
+  const paddingX = widthLessThan576 ? "xs" : "lg";
+
+  const { description, amount, category } = editedExpense;
+
   const amountErrorMsg =
-    editedExpense.amount < 0.05
+    amount < 0.05
       ? "Amount must be at least 0.05"
-      : editedExpense.amount > 100000
+      : amount > 100000
       ? "Amount must be less than 100000"
       : "";
 
   const descriptionErrorMsg =
-    editedExpense.description.length < 3
+    description.length < 3
       ? "Description must be at least 3 characters"
-      : editedExpense.description.length > 50
+      : description.length > 50
       ? "Description must be less than 50 characters"
       : "";
   return (
@@ -33,7 +40,7 @@ const EditableRow = ({
       <td>
         <TextInput
           aria-label="edit description"
-          value={editedExpense.description}
+          value={description}
           onChange={(event) =>
             setEditedExpense({
               ...editedExpense,
@@ -48,7 +55,7 @@ const EditableRow = ({
           aria-label="edit amount"
           precision={2}
           min={0}
-          value={editedExpense.amount}
+          value={amount}
           onChange={(value) =>
             setEditedExpense({
               ...editedExpense,
@@ -62,7 +69,7 @@ const EditableRow = ({
         <Select
           aria-label="edit category"
           data={[...categories]}
-          value={editedExpense.category}
+          value={category}
           onChange={(value) =>
             setEditedExpense({
               ...editedExpense,
@@ -73,11 +80,16 @@ const EditableRow = ({
       </td>
       <td>
         <Center px="xs">
-          <Button mr="xs" variant="light" onClick={() => onSave(editedExpense)}>
-            Save
+          <Button
+            variant="light"
+            mr="xs"
+            px={paddingX}
+            onClick={() => onSave(editedExpense)}
+          >
+            {widthLessThan576 ? <IconCheck /> : "Save"}
           </Button>
-          <Button variant="light" color="gray" onClick={onCancel}>
-            Cancel
+          <Button variant="light" color="gray" px={paddingX} onClick={onCancel}>
+            {widthLessThan576 ? <IconX /> : "Cancel"}
           </Button>
         </Center>
       </td>

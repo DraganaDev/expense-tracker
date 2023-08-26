@@ -1,14 +1,9 @@
-"use client";
 import {
   MantineProvider,
   ColorSchemeProvider,
   type ColorScheme,
 } from "@mantine/core";
-// import ExpensesLayout from "./layouts/ExpensesLayout";
 import { useState } from "react";
-
-import { Text } from "@mantine/core";
-import { Suspense } from "react";
 import AppLayout from "./layouts/AppLayout";
 
 function App() {
@@ -29,9 +24,7 @@ function App() {
         withGlobalStyles
         withNormalizeCSS
       >
-        <Suspense fallback={<Text color="red">Loading...</Text>}>
-          <AppLayout />
-        </Suspense>
+        <AppLayout />
       </MantineProvider>
     </ColorSchemeProvider>
   );
