@@ -1,22 +1,19 @@
 import { Select } from "@mantine/core";
-import { Expense } from "../layouts/ExpensesLayout";
+import { useGetExpensesQuery } from "../features/api/apiSlice";
 import { useMemo } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { setSearchValue } from "../features/filterAndSearchExpenses/filterAndSearchSlice";
 
-interface Props {
-  expenses: Expense[];
-  searchValue: string;
-  setSearchValue: (searchValue: string) => void;
-}
-
-const SearchByDescription = ({
-  expenses,
-  searchValue,
-  setSearchValue,
-}: Props) => {
+const SearchByDescription = () => {
+  const { data: expenses } = useGetExpensesQuery();
+  const dispatch = useAppDispatch();
+  const searchValue = useAppSelector(
+    (state) => state.filterAndSearch.searchValue
+  );
   const expensesDescriptions = useMemo(
     () => [
       ...new Set(
-        expenses.map((expense) => expense.description.toLowerCase()).sort()
+        expenses?.map((expense) => expense.description.toLowerCase()).sort()
       ),
     ],
     [expenses]
@@ -26,11 +23,11 @@ const SearchByDescription = ({
     <Select
       label="Search expense by description"
       placeholder=""
-      data={expensesDescriptions}
       searchable
       clearable
+      data={expensesDescriptions}
       searchValue={searchValue}
-      onSearchChange={setSearchValue}
+      onSearchChange={(value) => dispatch(setSearchValue(value))}
       nothingFound="No such expense"
     />
   );

@@ -3,6 +3,8 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { categories } from "../categories";
+import { useCreateExpenseMutation } from "../features/api/apiSlice";
+import { useErrorBoundary } from "react-error-boundary";
 
 const expenseSchema = z.object({
   description: z
@@ -20,11 +22,7 @@ const expenseSchema = z.object({
 
 export type ExpenseData = z.infer<typeof expenseSchema>;
 
-interface Props {
-  addExpense: (expense: ExpenseData) => void;
-}
-
-const ExpenseForm = ({ addExpense }: Props) => {
+const ExpenseForm = () => {
   const {
     handleSubmit,
     control,
@@ -34,20 +32,27 @@ const ExpenseForm = ({ addExpense }: Props) => {
     resolver: zodResolver(expenseSchema),
     defaultValues: { description: "", amount: 0, category: "Groceries" },
   });
+  const { showBoundary } = useErrorBoundary();
+  const [createExpense] = useCreateExpenseMutation();
 
   const labelAndAsterisk = {
     label: { color: "steelblue" },
     required: { color: "violet" },
   };
 
+  const addExpense = async (expense: ExpenseData) => {
+    const newExpense = { ...expense, id: Math.floor(Math.random() * 100000) };
+    try {
+      await createExpense(newExpense).unwrap();
+      reset();
+    } catch (err) {
+      showBoundary(err);
+    }
+  };
+
   return (
     <Box maw={350} mx="auto" pb="xl">
-      <form
-        onSubmit={handleSubmit((data) => {
-          addExpense(data);
-          reset();
-        })}
-      >
+      <form onSubmit={handleSubmit((data) => addExpense(data))}>
         <Controller
           name="description"
           control={control}

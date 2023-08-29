@@ -9,13 +9,4 @@ export const categories = [
   "Household",
 ] as const;
 
-export type Category =
-  | "All"
-  | "Groceries"
-  | "Utilities"
-  | "Entertainment"
-  | "Clothes"
-  | "Shoes"
-  | "Cosmetics"
-  | "Hygiene"
-  | "Household";
+export type Category = (typeof categories)[number] | "All";

@@ -1,26 +1,27 @@
 import { TextInput, NumberInput, Select, Button, Center } from "@mantine/core";
-import { categories } from "../categories";
-import { Expense } from "../layouts/ExpensesLayout";
 import { useMediaQuery } from "@mantine/hooks";
+import { categories } from "../categories";
 import { IconCheck, IconX } from "@tabler/icons-react";
+import { Expense, useUpdateExpenseMutation } from "../features/api/apiSlice";
+import { useErrorBoundary } from "react-error-boundary";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import {
+  setDescription,
+  setAmount,
+  setCategory,
+  resetInitialExpense,
+} from "../features/editedExpense/editedExpenseSlice";
 
-interface Props {
-  editedExpense: Expense;
-  setEditedExpense: (expense: Expense) => void;
-  onSave: (expense: Expense) => void;
-  onCancel: () => void;
-}
+const EditableRow = () => {
+  const [updateExpense] = useUpdateExpenseMutation();
+  const { showBoundary } = useErrorBoundary();
+  const dispatch = useAppDispatch();
 
-const EditableRow = ({
-  editedExpense,
-  setEditedExpense,
-  onSave,
-  onCancel,
-}: Props) => {
+  const editedExpense = useAppSelector((state) => state.editedExpense);
+  const { description, amount, category } = editedExpense;
+
   const widthLessThan576 = useMediaQuery("(max-width: 576px)");
   const paddingX = widthLessThan576 ? "xs" : "lg";
-
-  const { description, amount, category } = editedExpense;
 
   const amountErrorMsg =
     amount < 0.05
@@ -35,6 +36,20 @@ const EditableRow = ({
       : description.length > 50
       ? "Description must be less than 50 characters"
       : "";
+
+  const onSave = async (updatedExpense: Expense) => {
+    const descr = updatedExpense.description.length;
+    const amount = updatedExpense.amount;
+    try {
+      if (descr > 2 && descr < 50 && amount >= 0.05 && amount < 100000) {
+        await updateExpense(updatedExpense).unwrap();
+        dispatch(resetInitialExpense());
+      }
+    } catch (error) {
+      showBoundary(error);
+    }
+  };
+
   return (
     <>
       <td>
@@ -42,10 +57,7 @@ const EditableRow = ({
           aria-label="edit description"
           value={description}
           onChange={(event) =>
-            setEditedExpense({
-              ...editedExpense,
-              description: event.currentTarget.value,
-            })
+            dispatch(setDescription(event.currentTarget.value))
           }
           error={descriptionErrorMsg}
         />
@@ -56,26 +68,16 @@ const EditableRow = ({
           precision={2}
           min={0}
           value={amount}
-          onChange={(value) =>
-            setEditedExpense({
-              ...editedExpense,
-              amount: Number(value),
-            })
-          }
+          onChange={(value) => dispatch(setAmount(Number(value)))}
           error={amountErrorMsg}
         />
       </td>
       <td>
         <Select
           aria-label="edit category"
-          data={[...categories]}
+          data={categories}
           value={category}
-          onChange={(value) =>
-            setEditedExpense({
-              ...editedExpense,
-              category: value!,
-            })
-          }
+          onChange={(value) => dispatch(setCategory(value!))}
         />
       </td>
       <td>
@@ -88,7 +90,12 @@ const EditableRow = ({
           >
             {widthLessThan576 ? <IconCheck /> : "Save"}
           </Button>
-          <Button variant="light" color="gray" px={paddingX} onClick={onCancel}>
+          <Button
+            variant="light"
+            color="gray"
+            px={paddingX}
+            onClick={() => dispatch(resetInitialExpense())}
+          >
             {widthLessThan576 ? <IconX /> : "Cancel"}
           </Button>
         </Center>

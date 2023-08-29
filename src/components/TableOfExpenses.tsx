@@ -1,29 +1,14 @@
 import { Table, Center, Text } from "@mantine/core";
-import { type Expense } from "../layouts/ExpensesLayout";
 import EditableRow from "./EditableRow";
 import ReadOnlyRow from "./ReadOnlyRow";
+import { useVisibleExpenses } from "../hooks/useVisibleExpenses";
+import { useAppSelector } from "../app/hooks";
 
-interface Props {
-  expenses: Expense[];
+const TableOfExpenses = () => {
+  const visibleExpenses = useVisibleExpenses();
+  const editedExpenseId = useAppSelector((state) => state.editedExpense.id);
 
-  editedExpense: Expense;
-  setEditedExpense: (expense: Expense) => void;
-  onEdit: (expense: Expense) => void;
-  onSave: (expense: Expense) => void;
-  onDelete: (id: number) => void;
-  onCancel: () => void;
-}
-
-const TableOfExpenses = ({
-  expenses,
-  editedExpense,
-  setEditedExpense,
-  onEdit,
-  onSave,
-  onDelete,
-  onCancel,
-}: Props) => {
-  if (expenses.length === 0)
+  if (visibleExpenses?.length === 0)
     return (
       <Center>
         <Text size="lg" c="grape.7">
@@ -43,7 +28,7 @@ const TableOfExpenses = ({
     >
       <caption>
         <Text italic size="md" fw={500} c="steelblue">
-          Number of expenses: {expenses.length}
+          Number of expenses: {visibleExpenses?.length}
         </Text>
       </caption>
       <thead>
@@ -63,21 +48,12 @@ const TableOfExpenses = ({
         </tr>
       </thead>
       <tbody>
-        {expenses.map((expense) => (
+        {visibleExpenses?.map((expense) => (
           <tr key={expense.id}>
-            {editedExpense.id === expense.id ? (
-              <EditableRow
-                editedExpense={editedExpense}
-                setEditedExpense={setEditedExpense}
-                onSave={onSave}
-                onCancel={onCancel}
-              />
+            {editedExpenseId === expense.id ? (
+              <EditableRow />
             ) : (
-              <ReadOnlyRow
-                expense={expense}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
+              <ReadOnlyRow expense={expense} />
             )}
           </tr>
         ))}
@@ -92,8 +68,8 @@ const TableOfExpenses = ({
           <th>
             <Center fz={17} fw={500} c="steelblue">
               $
-              {expenses
-                .reduce((acc, expense) => acc + expense.amount, 0)
+              {visibleExpenses
+                ?.reduce((acc, expense) => acc + expense.amount, 0)
                 .toFixed(2)}
             </Center>
           </th>

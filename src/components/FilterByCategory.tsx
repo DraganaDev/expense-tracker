@@ -1,14 +1,18 @@
 import { Select } from "@mantine/core";
 import { categories, type Category } from "../categories";
 import { useMemo } from "react";
+import { setSelectedCategory } from "../features/filterAndSearchExpenses/filterAndSearchSlice";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 
-interface Props {
-  selectedCategory: Category;
-  setSelectedCategory: (category: Category) => void;
-}
-
-const FilterByCategory = ({ selectedCategory, setSelectedCategory }: Props) => {
-  const optionCategories = useMemo(() => ["All", ...categories], []);
+const FilterByCategory = () => {
+  const selectedCategory = useAppSelector(
+    (state) => state.filterAndSearch.selectedCategory
+  );
+  const dispatch = useAppDispatch();
+  const optionCategories: Category[] = useMemo(
+    () => ["All", ...categories],
+    []
+  );
 
   return (
     <Select
@@ -16,7 +20,7 @@ const FilterByCategory = ({ selectedCategory, setSelectedCategory }: Props) => {
       label="Filter expenses by category"
       data={optionCategories}
       value={selectedCategory}
-      onChange={setSelectedCategory}
+      onChange={(value) => dispatch(setSelectedCategory(value as Category))}
     />
   );
 };

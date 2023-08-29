@@ -1,16 +1,23 @@
 import { Button, Center } from "@mantine/core";
-import { type Expense } from "../layouts/ExpensesLayout";
+import { Expense, useDeleteExpenseMutation } from "../features/api/apiSlice";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
+import { setEditedExpense } from "../features/editedExpense/editedExpenseSlice";
+import { useAppDispatch } from "../app/hooks";
+// import { useErrorBoundary } from "react-error-boundary";
 
 interface Props {
   expense: Expense;
-  onEdit: (expense: Expense) => void;
-  onDelete: (id: number) => void;
 }
-const ReadOnlyRow = ({ expense, onEdit, onDelete }: Props) => {
+const ReadOnlyRow = ({ expense }: Props) => {
+  const dispatch = useAppDispatch();
+  const [deleteExpense, { error }] = useDeleteExpenseMutation();
+  // const { showBoundary } = useErrorBoundary();
+
   const widthLessThan576 = useMediaQuery("(max-width: 576px)");
   const paddingX = widthLessThan576 ? "xs" : "lg";
+
+  if (error) throw error;
   return (
     <>
       <td>{expense.description}</td>
@@ -23,7 +30,7 @@ const ReadOnlyRow = ({ expense, onEdit, onDelete }: Props) => {
             color="grape"
             mr="sm"
             px={paddingX}
-            onClick={() => onEdit(expense)}
+            onClick={() => dispatch(setEditedExpense(expense))}
           >
             {widthLessThan576 ? <IconPencil stroke={1.2} /> : " Edit"}
           </Button>
@@ -32,7 +39,7 @@ const ReadOnlyRow = ({ expense, onEdit, onDelete }: Props) => {
             color="gray"
             c="red.9"
             px={paddingX}
-            onClick={() => onDelete(expense.id)}
+            onClick={() => deleteExpense(expense.id)}
           >
             {widthLessThan576 ? <IconTrash stroke={1.2} /> : " Delete"}
           </Button>
